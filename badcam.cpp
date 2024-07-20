@@ -9,6 +9,8 @@ int main(int argc, char **argv) {
     cv::Mat frame;
     cv::VideoCapture cam(0);
 
+    std::string window_title = "badcam";
+
     // cam.open(0);
     if (!cam.isOpened()) {
         printf("ERROR! Unable to open camera\n");
@@ -16,7 +18,7 @@ int main(int argc, char **argv) {
     }
 
     // Create a window for display.
-    cv::namedWindow("badcam", cv::WINDOW_AUTOSIZE);
+    cv::namedWindow(window_title.c_str(), cv::WINDOW_NORMAL);
 
     while (cam.read(frame)) {
         if (frame.empty()) {
@@ -24,7 +26,7 @@ int main(int argc, char **argv) {
             break;
         }
 
-        cv::imshow("badcam", frame);
+        cv::imshow(window_title, frame);
         cv::waitKey(1);
     }
 
