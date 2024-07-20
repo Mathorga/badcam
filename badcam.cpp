@@ -16,7 +16,7 @@ int main(int argc, char **argv) {
     }
 
     // Create a window for display.
-    cv::namedWindow("badcam", cv::WINDOW_FULLSCREEN);
+    cv::namedWindow("badcam", cv::WINDOW_AUTOSIZE);
 
     while (cam.read(frame)) {
         if (frame.empty()) {
@@ -25,7 +25,7 @@ int main(int argc, char **argv) {
         }
 
         cv::imshow("badcam", frame);
-        cv::pollKey();
+        cv::waitKey(1);
     }
 
     return 0;
