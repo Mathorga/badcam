@@ -4,30 +4,42 @@
 #include <opencv2/videoio.hpp>
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgcodecs.hpp>
+#include <iostream>
 
 int main(int argc, char **argv) {
-    cv::Mat frame;
-    cv::VideoCapture cam(0);
-
+    cv::Mat frame;// = cv::imread("/home/luka/Pictures/Screenshots/Screenshotfrom2024-04-1723-33-43.png");
+    cv::VideoCapture cam;
     std::string window_title = "badcam";
 
-    // cam.open(0);
+    cam.open(0);
     if (!cam.isOpened()) {
         printf("ERROR! Unable to open camera\n");
         return -1;
     }
 
     // Create a window for display.
-    cv::namedWindow(window_title.c_str(), cv::WINDOW_NORMAL);
+    cv::namedWindow(window_title, cv::WINDOW_NORMAL);
+    std::cout << "Created window" << std::endl;
+    cv::setWindowProperty(window_title, cv::WND_PROP_FULLSCREEN, cv::WINDOW_FULLSCREEN);
+    std::cout << "Set fullscreen" << std::endl;
+    // cv::Rect screen_rect = cv::getWindowImageRect(window_title);
+    // std::cout << "Captured screen rect" << screen_rect.width << std::endl;
+    // cv::Size screen_size = screen_rect.size();
+    // std::cout << screen_size.width << std::endl;
 
-    while (cam.read(frame)) {
+    while (true) {
+        cam.read(frame);
+
         if (frame.empty()) {
             printf("ERROR! blank frame grabbed\n");
             break;
         }
 
-        cv::imshow(window_title, frame);
-        cv::waitKey(1);
+        cv::Mat resized;
+        cv::resize(frame, resized, cv::Size(720, 480));
+
+        cv::imshow(window_title, resized);
+        cv::waitKey(25);
     }
 
     return 0;
