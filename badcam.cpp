@@ -24,14 +24,18 @@ int main(int argc, char **argv) {
     }
 
     // Create a window to display textures on screen.
-    InitWindow(100, 100, "badcam");
+    InitWindow(1920, 1080, "badcam");
     ToggleFullscreen();
+
     const int current_screen = GetCurrentMonitor();
     const float screen_width = GetMonitorWidth(current_screen);
+    // const float screen_width = GetScreenWidth();
     const float screen_height = GetMonitorHeight(current_screen);
+    // const float screen_height = GetScreenHeight();
 
     std::cout << screen_width << std::endl;
     std::cout << screen_height << std::endl;
+
     Image image;
 
     SetTargetFPS(60);
@@ -87,7 +91,7 @@ int main(int argc, char **argv) {
         float final_height = image.height * scale;
 
         BeginDrawing();
-            ClearBackground(RAYWHITE);
+            ClearBackground(Color());
             DrawTexturePro(
                 texture,
                 // Source area (all the texture).
