@@ -61,19 +61,19 @@ int main(int argc, char **argv) {
             break;
         }
 
-        // Convert color space.
-        cv::cvtColor(frame, frame, cv::COLOR_BGR2RGB);
+        // // Convert color space.
+        // cv::cvtColor(frame, frame, cv::COLOR_BGR2RGB);
 
-        // Split channels.
-        cv::split(frame, channels_vec);
+        // // Split channels.
+        // cv::split(frame, channels_vec);
 
-        // Update channel values.
-        channels_vec[0] *= a_mod;
-        channels_vec[1] *= b_mod;
-        channels_vec[2] *= c_mod;
+        // // Update channel values.
+        // channels_vec[0] *= a_mod;
+        // channels_vec[1] *= b_mod;
+        // channels_vec[2] *= c_mod;
 
-        // Merge updated channels.
-        cv::merge(channels_vec, frame);
+        // // Merge updated channels.
+        // cv::merge(channels_vec, frame);
 
         // Copy opencv mat to raylib image and then to texture.
         image.data = frame.ptr();
