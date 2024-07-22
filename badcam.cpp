@@ -2,68 +2,101 @@
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>
 #include <opencv2/videoio.hpp>
-#include <opencv2/highgui.hpp>
 #include <opencv2/imgcodecs.hpp>
 #include <raylib.h>
 #include <iostream>
 
 int main(int argc, char **argv) {
-    const int screenWidth = 800;
-    const int screenHeight = 450;
-    cv::Mat frame;// = cv::imread("/home/luka/Pictures/Screenshots/Screenshotfrom2024-04-1723-33-43.png");
+    cv::Mat frame;
     cv::VideoCapture cam;
-    std::string window_title = "badcam";
 
-    cam.open(0);
+    float h_modifier = 0.5f;
+
+    // cam.open(0);
+    cam.open("/home/luka/pictures/vid.mp4");
     if (!cam.isOpened()) {
         printf("ERROR! Unable to open camera\n");
         return -1;
     }
 
-    // Create a window for display.
-    // cv::namedWindow(window_title, cv::WINDOW_NORMAL);
-    // std::cout << "Created window" << std::endl;
-    // cv::setWindowProperty(window_title, cv::WND_PROP_FULLSCREEN, cv::WINDOW_FULLSCREEN);
-    // std::cout << "Set fullscreen" << std::endl;
-    // cv::Rect screen_rect = cv::getWindowImageRect(window_title);
-    // std::cout << "Captured screen rect" << screen_rect.width << std::endl;
-    // cv::Size screen_size = screen_rect.size();
-    // std::cout << screen_size.width << std::endl;
+    InitWindow(100, 100, "raylib [textures] example - image drawing");
+    ToggleFullscreen();
+    const int current_screen = GetCurrentMonitor();
+    const float screen_width = GetMonitorWidth(current_screen);
+    const float screen_height = GetMonitorHeight(current_screen);
 
-    InitWindow(screenWidth, screenHeight, "raylib [textures] example - image drawing");
-    Texture2D texture();
+    std::cout << screen_width << std::endl;
+    std::cout << screen_height << std::endl;
+    Image image;
 
     SetTargetFPS(60);
 
-    while (true) {
-        cam.read(frame);
+    while (!WindowShouldClose()) {
+        h_modifier += 0.01f;
+        if (h_modifier > 1.0f) {
+            h_modifier = 0.0f;
+        }
 
+        // Read videocapture feed and make sure it's not empty.
+        cam.read(frame);
         if (frame.empty()) {
             printf("ERROR! blank frame grabbed\n");
             break;
         }
 
-        // cv::Mat resized;
-        // cv::resize(frame, resized, cv::Size(720, 480));
+        // Split HSV values.
+        cv::Mat hsv_frame;
+        std::vector<cv::Mat> hsv_vec;
+        cv::cvtColor(frame, hsv_frame, cv::COLOR_BGR2HSV);
+        cv::split(hsv_frame, hsv_vec);
 
-        cvtColor(frame, frame, COLOR_BGR2RGB);
-        texture.data = frame.ptr();
-        texture.height = frame.rows;
-        texture.width = frame.cols;
-        texture.format = 4;
-        texture.mipmaps = 1;
+        // Update the hue value.
+        hsv_vec[0] = 255.0f * h_modifier;
 
-        // cv::imshow(window_title, resized);
-        // cv::waitKey(25);
+        // Merge the resulting channels.
+        cv::merge(hsv_vec, hsv_frame);
+
+        // Convert color space, since opencv and raylib use different default color spaces.
+        cv::cvtColor(hsv_frame, frame, cv::COLOR_HSV2RGB);
+
+        // Copy opencv mat to raylib image.
+        image.data = frame.ptr();
+        image.height = frame.rows;
+        image.width = frame.cols;
+        image.format = 4;
+        image.mipmaps = 1;
+
+        // Compute texture scaling in order to fit it to the current window.
+        float h_ratio = screen_width / image.width;
+        float v_ratio = screen_height / image.height;
+        float scale = std::min(h_ratio, v_ratio);
+        float final_width = image.width * scale;
+        float final_height = image.height * scale;
+
+        Texture2D texture = LoadTextureFromImage(image);
 
         BeginDrawing();
             ClearBackground(RAYWHITE);
-
-            DrawTexture(texture, screenWidth/2 - texture.width/2, screenHeight/2 - texture.height/2 - 40, WHITE);
+            DrawTexturePro(
+                texture,
+                // Source area (all the texture).
+                Rectangle{0, 0, image.width, image.height},
+                // Destination area.
+                Rectangle{
+                    (screen_width / 2) - (final_width / 2),
+                    (screen_height / 2) - (final_height / 2),
+                    final_width,
+                    final_height
+                },
+                Vector2{0, 0},
+                0,
+                WHITE
+            );
         EndDrawing();
+
+        // UnloadTexture(texture);
     }
 
-    UnloadTexture(texture);
     CloseWindow();
 
     return 0;
