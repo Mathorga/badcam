@@ -1,25 +1,30 @@
 #include <stdio.h>
+#include <raylib.h>
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>
 #include <opencv2/videoio.hpp>
 #include <opencv2/imgcodecs.hpp>
-#include <raylib.h>
+#include <cmath>
 #include <iostream>
 
 int main(int argc, char **argv) {
     cv::Mat frame;
     cv::VideoCapture cam;
+    std::vector<cv::Mat> channels_vec;
 
-    float h_modifier = 0.5f;
+    float a_mod = 0.0f;
+    float b_mod = 0.33f;
+    float c_mod = 0.66f;
 
-    // cam.open(0);
-    cam.open("/home/luka/pictures/vid.mp4");
+    cam.open(0);
+    // cam.open("/home/luka/pictures/vid.mp4");
     if (!cam.isOpened()) {
         printf("ERROR! Unable to open camera\n");
         return -1;
     }
 
-    InitWindow(100, 100, "raylib [textures] example - image drawing");
+    // Create a window to display textures on screen.
+    InitWindow(100, 100, "badcam");
     ToggleFullscreen();
     const int current_screen = GetCurrentMonitor();
     const float screen_width = GetMonitorWidth(current_screen);
@@ -32,9 +37,17 @@ int main(int argc, char **argv) {
     SetTargetFPS(60);
 
     while (!WindowShouldClose()) {
-        h_modifier += 0.01f;
-        if (h_modifier > 1.0f) {
-            h_modifier = 0.0f;
+        a_mod += 0.01f;
+        if (a_mod > 1.0f) {
+            a_mod = 0.0f;
+        }
+        b_mod += 0.01f;
+        if (b_mod > 1.0f) {
+            b_mod = 0.0f;
+        }
+        c_mod += 0.01f;
+        if (c_mod > 1.0f) {
+            c_mod = 0.0f;
         }
 
         // Read videocapture feed and make sure it's not empty.
@@ -44,27 +57,27 @@ int main(int argc, char **argv) {
             break;
         }
 
-        // Split HSV values.
-        cv::Mat hsv_frame;
-        std::vector<cv::Mat> hsv_vec;
-        cv::cvtColor(frame, hsv_frame, cv::COLOR_BGR2HSV);
-        cv::split(hsv_frame, hsv_vec);
+        // Convert color space.
+        cv::cvtColor(frame, frame, cv::COLOR_BGR2RGB);
 
-        // Update the hue value.
-        hsv_vec[0] = 255.0f * h_modifier;
+        // Split channels.
+        cv::split(frame, channels_vec);
 
-        // Merge the resulting channels.
-        cv::merge(hsv_vec, hsv_frame);
+        // Update channel values.
+        channels_vec[0] *= a_mod;
+        channels_vec[1] *= b_mod;
+        channels_vec[2] *= c_mod;
 
-        // Convert color space, since opencv and raylib use different default color spaces.
-        cv::cvtColor(hsv_frame, frame, cv::COLOR_HSV2RGB);
+        // Merge updated channels.
+        cv::merge(channels_vec, frame);
 
-        // Copy opencv mat to raylib image.
+        // Copy opencv mat to raylib image and then to texture.
         image.data = frame.ptr();
         image.height = frame.rows;
         image.width = frame.cols;
         image.format = 4;
         image.mipmaps = 1;
+        Texture2D texture = LoadTextureFromImage(image);
 
         // Compute texture scaling in order to fit it to the current window.
         float h_ratio = screen_width / image.width;
@@ -73,14 +86,12 @@ int main(int argc, char **argv) {
         float final_width = image.width * scale;
         float final_height = image.height * scale;
 
-        Texture2D texture = LoadTextureFromImage(image);
-
         BeginDrawing();
             ClearBackground(RAYWHITE);
             DrawTexturePro(
                 texture,
                 // Source area (all the texture).
-                Rectangle{0, 0, image.width, image.height},
+                Rectangle{0, 0, (float) image.width, (float) image.height},
                 // Destination area.
                 Rectangle{
                     (screen_width / 2) - (final_width / 2),
@@ -94,9 +105,10 @@ int main(int argc, char **argv) {
             );
         EndDrawing();
 
-        // UnloadTexture(texture);
+        UnloadTexture(texture);
     }
 
+    UnloadImage(image);
     CloseWindow();
 
     return 0;
