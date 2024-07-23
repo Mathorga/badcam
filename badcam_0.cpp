@@ -1,13 +1,13 @@
 #include <stdio.h>
+#include <raylib.h>
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>
 #include <opencv2/videoio.hpp>
-#include <opencv2/highgui.gpp>
 #include <opencv2/imgcodecs.hpp>
 #include <cmath>
 #include <iostream>
 
-/// OpenCV-only version.
+/// OpenCV + raylib version.
 int main(int argc, char **argv) {
     cv::Mat frame;
     cv::VideoCapture cam;
@@ -17,20 +17,31 @@ int main(int argc, char **argv) {
     float b_mod = 0.33f;
     float c_mod = 0.66f;
 
-    // cam.open(0);
-    cam.open("/home/luka/pictures/vid.mp4");
+    cam.open(0);
+    // cam.open("/home/luka/pictures/vid.mp4");
     if (!cam.isOpened()) {
         printf("ERROR! Unable to open camera\n");
         return -1;
     }
 
     // Create a window to display textures on screen.
-    cv::namedWindow("badcam", cv::WINDOW_NORMAL);
+    InitWindow(1920, 1080, "badcam");
+    ToggleFullscreen();
+
+    const int current_screen = GetCurrentMonitor();
+    const float screen_width = GetMonitorWidth(current_screen);
+    // const float screen_width = GetScreenWidth();
+    const float screen_height = GetMonitorHeight(current_screen);
+    // const float screen_height = GetScreenHeight();
 
     std::cout << screen_width << std::endl;
     std::cout << screen_height << std::endl;
 
-    for (;;) {
+    Image image;
+
+    SetTargetFPS(60);
+
+    while (!WindowShouldClose()) {
         a_mod += 0.01f;
         if (a_mod > 1.0f) {
             a_mod = 0.0f;
@@ -65,6 +76,14 @@ int main(int argc, char **argv) {
         // // Merge updated channels.
         // cv::merge(channels_vec, frame);
 
+        // Copy opencv mat to raylib image and then to texture.
+        image.data = frame.ptr();
+        image.height = frame.rows;
+        image.width = frame.cols;
+        image.format = 4;
+        image.mipmaps = 1;
+        Texture2D texture = LoadTextureFromImage(image);
+
         // Compute texture scaling in order to fit it to the current window.
         float h_ratio = screen_width / image.width;
         float v_ratio = screen_height / image.height;
@@ -72,7 +91,26 @@ int main(int argc, char **argv) {
         float final_width = image.width * scale;
         float final_height = image.height * scale;
 
-        cv::imshow("badcam", frame);
+        BeginDrawing();
+            ClearBackground(Color());
+            DrawTexturePro(
+                texture,
+                // Source area (all the texture).
+                Rectangle{0, 0, (float) image.width, (float) image.height},
+                // Destination area.
+                Rectangle{
+                    (screen_width / 2) - (final_width / 2),
+                    (screen_height / 2) - (final_height / 2),
+                    final_width,
+                    final_height
+                },
+                Vector2{0, 0},
+                0,
+                WHITE
+            );
+        EndDrawing();
+
+        UnloadTexture(texture);
     }
 
     UnloadImage(image);
