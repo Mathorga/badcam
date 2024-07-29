@@ -79,7 +79,7 @@ int main(int argc, char **argv) {
         if (pressed_key == 32) {
             // Capture frame and save it to file.
             time = std::chrono::system_clock::now();
-	    millis_since_epoch = time.time_since_epoch().count();
+            millis_since_epoch = time.time_since_epoch().count();
             cv::imwrite("/home/luka/Desktop/test" + std::to_string(millis_since_epoch) + ".jpg", frame);
         }
 
