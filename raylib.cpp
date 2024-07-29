@@ -24,8 +24,11 @@ int main(int argc, char **argv) {
         return -1;
     }
 
+    cam.set(cv::CAP_PROP_FRAME_WIDTH, 64);
+    cam.set(cv::CAP_PROP_FRAME_HEIGHT, 48);
+
     // Create a window to display textures on screen.
-    InitWindow(1920, 1080, "badcam");
+    InitWindow(640, 480, "badcam");
     ToggleFullscreen();
 
     const int current_screen = GetCurrentMonitor();
