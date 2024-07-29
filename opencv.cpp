@@ -21,9 +21,6 @@ int main(int argc, char **argv) {
     uint16_t preview_width = 320;
     uint16_t preview_height = 240;
 
-    uint16_t capture_width = 640;
-    uint16_t capture_height = 480;
-
     float a_mod = 0.0f;
     float b_mod = 0.33f;
     float c_mod = 0.66f;
@@ -83,20 +80,12 @@ int main(int argc, char **argv) {
         }
 
         if (pressed_key == 32) {
-            // Set capture resolution.
-            preview.set(cv::CAP_PROP_FRAME_WIDTH, capture_width);
-            preview.set(cv::CAP_PROP_FRAME_HEIGHT, capture_height);
-
             // Capture time to generate file name.
             time = std::chrono::system_clock::now();
             millis_since_epoch = time.time_since_epoch().count();
 
             // Save frame to file.
-            cv::imwrite("/home/luka/Desktop/test" + std::to_string(millis_since_epoch) + ".jpg", frame);
-
-            // Reset preview resolution.
-            preview.set(cv::CAP_PROP_FRAME_WIDTH, preview_width);
-            preview.set(cv::CAP_PROP_FRAME_HEIGHT, preview_height);
+            cv::imwrite("/home/luka/Desktop/capture" + std::to_string(millis_since_epoch) + ".jpg", frame);
         }
 
         // Unconditionally try and update the window to fullscreen.
