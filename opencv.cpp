@@ -83,13 +83,13 @@ int main(int argc, char **argv) {
         }
 
         if (pressed_key == 32) {
-            // Capture time to generate file name.
-            time = std::chrono::system_clock::now();
-            millis_since_epoch = time.time_since_epoch().count();
-
             // Set capture resolution.
             preview.set(cv::CAP_PROP_FRAME_WIDTH, capture_width);
             preview.set(cv::CAP_PROP_FRAME_HEIGHT, capture_height);
+
+            // Capture time to generate file name.
+            time = std::chrono::system_clock::now();
+            millis_since_epoch = time.time_since_epoch().count();
 
             // Save frame to file.
             cv::imwrite("/home/luka/Desktop/test" + std::to_string(millis_since_epoch) + ".jpg", frame);
