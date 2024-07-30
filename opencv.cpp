@@ -11,7 +11,7 @@
 
 /// OpenCV-only version.
 int main(int argc, char **argv) {
-    cv::Mat frame;
+    cv::Mat preview_frame;
     cv::Mat capture_frame;
     cv::VideoCapture preview;
     // std::vector<cv::Mat> channels_vec;
@@ -40,22 +40,22 @@ int main(int argc, char **argv) {
 
     for (;;) {
         // Read videocapture feed and make sure it's not empty.
-        preview.read(frame);
-        if (frame.empty()) {
-            printf("ERROR! blank frame grabbed\n");
+        preview.read(preview_frame);
+        if (preview_frame.empty()) {
+            printf("ERROR! blank preview_frame grabbed\n");
             break;
         }
 
         // Split channels.
-        // cv::split(frame, channels_vec);
+        // cv::split(preview_frame, channels_vec);
 
         // Update channel values.
         // TODO
 
         // Merge updated channels.
-        // cv::merge(channels_vec, frame);
+        // cv::merge(channels_vec, preview_frame);
 
-        cv::imshow("badcam", frame);
+        cv::imshow("badcam", preview_frame);
         pressed_key = (char) cv::waitKey(25);
 
         if (pressed_key == 27) {
@@ -79,7 +79,7 @@ int main(int argc, char **argv) {
             preview.set(cv::CAP_PROP_FRAME_WIDTH, preview_width);
             preview.set(cv::CAP_PROP_FRAME_HEIGHT, preview_height);
 
-            // Save frame to file.
+            // Save preview_frame to file.
             cv::imwrite("/home/luka/Desktop/capture" + std::to_string(millis_since_epoch) + ".jpg", capture_frame);
         }
 
