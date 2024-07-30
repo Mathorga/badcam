@@ -23,6 +23,9 @@ int main(int argc, char **argv) {
     uint16_t preview_width = 320;
     uint16_t preview_height = 240;
 
+    uint16_t screen_width = 720;
+    uint16_t screen_height = 480;
+
     uint16_t capture_width = 1280;
     uint16_t capture_height = 960;
 
@@ -57,6 +60,7 @@ int main(int argc, char **argv) {
         // Merge updated channels.
         // cv::merge(channels_vec, preview_frame);
 
+        cv::resize(preview_frame, preview_frame, cv::Size(screen_width, screen_height));
         cv::imshow(window_title, preview_frame);
         pressed_key = (char) cv::waitKey(25);
 
