@@ -58,9 +58,6 @@ int main(int argc, char **argv) {
         cv::imshow("badcam", frame);
         pressed_key = (char) cv::waitKey(25);
 
-        // Unconditionally try and update the window to fullscreen.
-        cv::setWindowProperty("badcam", cv::WND_PROP_FULLSCREEN, cv::WINDOW_FULLSCREEN);
-
         if (pressed_key == 27) {
             // ESC key was pressed.
             break;
@@ -85,6 +82,9 @@ int main(int argc, char **argv) {
             // Save frame to file.
             cv::imwrite("/home/luka/Desktop/capture" + std::to_string(millis_since_epoch) + ".jpg", capture_frame);
         }
+
+        // Unconditionally try and update the window to fullscreen.
+        cv::setWindowProperty("badcam", cv::WND_PROP_FULLSCREEN, cv::WINDOW_FULLSCREEN);
     }
 
     return 0;
