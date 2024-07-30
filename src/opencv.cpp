@@ -11,6 +11,7 @@
 
 /// OpenCV-only version.
 int main(int argc, char **argv) {
+    std::string window_title = "badcam";
     cv::Mat preview_frame;
     cv::Mat capture_frame;
     cv::VideoCapture preview;
@@ -36,7 +37,7 @@ int main(int argc, char **argv) {
     preview.set(cv::CAP_PROP_FRAME_HEIGHT, preview_height);
 
     // Create a window to display textures on screen.
-    cv::namedWindow("badcam", cv::WINDOW_NORMAL);
+    cv::namedWindow(window_title, cv::WINDOW_NORMAL);
 
     for (;;) {
         // Read videocapture feed and make sure it's not empty.
@@ -55,7 +56,7 @@ int main(int argc, char **argv) {
         // Merge updated channels.
         // cv::merge(channels_vec, preview_frame);
 
-        cv::imshow("badcam", preview_frame);
+        cv::imshow(window_title, preview_frame);
         pressed_key = (char) cv::waitKey(25);
 
         if (pressed_key == 27) {
@@ -84,7 +85,7 @@ int main(int argc, char **argv) {
         }
 
         // Unconditionally try and update the window to fullscreen.
-        cv::setWindowProperty("badcam", cv::WND_PROP_FULLSCREEN, cv::WINDOW_FULLSCREEN);
+        cv::setWindowProperty(window_title, cv::WND_PROP_FULLSCREEN, cv::WINDOW_FULLSCREEN);
     }
 
     return 0;
