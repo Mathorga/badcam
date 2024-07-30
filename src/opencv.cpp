@@ -36,8 +36,9 @@ int main(int argc, char **argv) {
     preview.set(cv::CAP_PROP_FRAME_WIDTH, preview_width);
     preview.set(cv::CAP_PROP_FRAME_HEIGHT, preview_height);
 
-    // Create a window to display textures on screen.
+    // Create a window to display images on screen.
     cv::namedWindow(window_title, cv::WINDOW_NORMAL);
+    cv::setWindowProperty(window_title, cv::WND_PROP_FULLSCREEN, cv::WINDOW_FULLSCREEN);
 
     for (;;) {
         // Read videocapture feed and make sure it's not empty.
@@ -83,9 +84,6 @@ int main(int argc, char **argv) {
             // Save preview_frame to file.
             cv::imwrite("/home/luka/Desktop/capture" + std::to_string(millis_since_epoch) + ".jpg", capture_frame);
         }
-
-        // Unconditionally try and update the window to fullscreen.
-        cv::setWindowProperty(window_title, cv::WND_PROP_FULLSCREEN, cv::WINDOW_FULLSCREEN);
     }
 
     return 0;
