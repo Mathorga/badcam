@@ -12,8 +12,9 @@
 /// OpenCV-only version.
 int main(int argc, char **argv) {
     cv::Mat frame;
+    cv::Mat capture_frame;
     cv::VideoCapture preview;
-    std::vector<cv::Mat> channels_vec;
+    // std::vector<cv::Mat> channels_vec;
     char pressed_key;
     std::chrono::system_clock::time_point time;
     uint64_t millis_since_epoch;
@@ -21,9 +22,8 @@ int main(int argc, char **argv) {
     uint16_t preview_width = 320;
     uint16_t preview_height = 240;
 
-    float a_mod = 0.0f;
-    float b_mod = 0.33f;
-    float c_mod = 0.66f;
+    uint16_t capture_width = 1280;
+    uint16_t capture_height = 960;
 
     preview.open(0);
     if (!preview.isOpened()) {
@@ -39,20 +39,6 @@ int main(int argc, char **argv) {
     cv::namedWindow("badcam", cv::WINDOW_NORMAL);
 
     for (;;) {
-        // Update modifiers.
-        a_mod += 0.01f;
-        if (a_mod > 1.0f) {
-            a_mod = 0.0f;
-        }
-        b_mod += 0.01f;
-        if (b_mod > 1.0f) {
-            b_mod = 0.0f;
-        }
-        c_mod += 0.01f;
-        if (c_mod > 1.0f) {
-            c_mod = 0.0f;
-        }
-
         // Read videocapture feed and make sure it's not empty.
         preview.read(frame);
         if (frame.empty()) {
@@ -64,9 +50,7 @@ int main(int argc, char **argv) {
         // cv::split(frame, channels_vec);
 
         // Update channel values.
-        // channels_vec[0] *= a_mod;
-        // channels_vec[1] *= b_mod;
-        // channels_vec[2] *= c_mod;
+        // TODO
 
         // Merge updated channels.
         // cv::merge(channels_vec, frame);
@@ -84,8 +68,19 @@ int main(int argc, char **argv) {
             time = std::chrono::system_clock::now();
             millis_since_epoch = time.time_since_epoch().count();
 
+            // Update the camera resolution for capture.
+            preview.set(cv::CAP_PROP_FRAME_WIDTH, capture_width);
+            preview.set(cv::CAP_PROP_FRAME_HEIGHT, capture_height);
+
+            // Capture image in capture resolution.
+            preview.read(capture_frame);
+
+            // Reset camera resolution to preview.
+            preview.set(cv::CAP_PROP_FRAME_WIDTH, preview_width);
+            preview.set(cv::CAP_PROP_FRAME_HEIGHT, preview_height);
+
             // Save frame to file.
-            cv::imwrite("/home/luka/Desktop/capture" + std::to_string(millis_since_epoch) + ".jpg", frame);
+            cv::imwrite("/home/luka/Desktop/capture" + std::to_string(millis_since_epoch) + ".jpg", capture_frame);
         }
 
         // Unconditionally try and update the window to fullscreen.
