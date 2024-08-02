@@ -64,8 +64,8 @@ int main(int argc, char **argv) {
         cv::imshow(window_title, preview_frame);
         pressed_key = (char) cv::waitKey(25);
 
-        if (pressed_key == 27) {
-            // ESC key was pressed.
+        if (pressed_key == 27 || pressed_key == 113) {
+            // ESC or Q key was pressed.
             break;
         }
 

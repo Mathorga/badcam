@@ -20,13 +20,13 @@ OBJS=$(patsubst %.o,$(BLD_DIR)/%.o,$@.o)
 MKDIR=mkdir -p
 RM=rm -rf
 
-all: create opencv
+all: create badcam
 
 # Builds binaries.
-opencv: create
+badcam: create
 	@printf "\n"
 	$(CPPCOMP) $(CPPCOMP_FLAGS) -c $(SRC_DIR)/$@.cpp -o $(BLD_DIR)/$@.o $(INCLUDE)
-	$(CPPCOMP) $(CPPLINK_FLAGS) $(OBJS) -o $(BIN_DIR)/$@ $(STD_LIBS) $(OPENCV_LIBS) $(BEHEMA_LIBS)
+	$(CPPCOMP) $(CPPLINK_FLAGS) $(OBJS) -o $(BIN_DIR)/$@ $(STD_LIBS) $(OPENCV_LIBS)
 	@printf "\nCreated $@!\n"
 
 
