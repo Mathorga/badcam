@@ -41,16 +41,16 @@ int main(int argc, char **argv) {
     cv::namedWindow(window_title, cv::WINDOW_NORMAL);
     cv::setWindowProperty(window_title, cv::WND_PROP_FULLSCREEN, cv::WINDOW_FULLSCREEN);
 
+    // Prepopulate frames.
+    preview.read(curr_frame);
+    curr_frame.copyTo(prev_frame);
+
     for (;;) {
         // Read videocapture feed and make sure it's not empty.
         preview.read(curr_frame);
         if (curr_frame.empty()) {
             printf("ERROR! blank frame grabbed\n");
             break;
-        }
-
-        if (prev_frame.empty()) {
-            continue;
         }
 
         cv::addWeighted(prev_frame, 0.2, curr_frame, 0.8, 0.0, blend_frame);
@@ -65,7 +65,7 @@ int main(int argc, char **argv) {
         }
 
         // Swap previous with current frame.
-        prev_frame = curr_frame;
+        curr_frame.copyTo(prev_frame);
     }
 
     return 0;
