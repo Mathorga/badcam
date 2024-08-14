@@ -15,6 +15,7 @@ int main(int argc, char **argv) {
     cv::Mat prev_frame;
     cv::Mat curr_frame;
     cv::Mat blend_frame;
+    cv::Mat display_frame;
     cv::VideoCapture preview;
     // std::vector<cv::Mat> channels_vec;
     char pressed_key;
@@ -54,8 +55,8 @@ int main(int argc, char **argv) {
 
         cv::addWeighted(prev_frame, 0.2, curr_frame, 0.8, 0.0, blend_frame);
 
-        cv::resize(blend_frame, blend_frame, cv::Size(screen_width, screen_height));
-        cv::imshow(window_title, blend_frame);
+        cv::resize(blend_frame, display_frame, cv::Size(screen_width, screen_height));
+        cv::imshow(window_title, display_frame);
         pressed_key = (char) cv::waitKey(25);
 
         if (pressed_key == 27 || pressed_key == 113) {
