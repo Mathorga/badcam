@@ -11,6 +11,7 @@
 
 /// OpenCV-only version.
 int main(int argc, char **argv) {
+    std::string window_title = "badcam";
     cv::Mat preview_frame;
     cv::Mat capture_frame;
     cv::VideoCapture preview;
@@ -21,6 +22,9 @@ int main(int argc, char **argv) {
 
     uint16_t preview_width = 320;
     uint16_t preview_height = 240;
+
+    uint16_t screen_width = 720;
+    uint16_t screen_height = 480;
 
     uint16_t capture_width = 1280;
     uint16_t capture_height = 960;
@@ -35,8 +39,9 @@ int main(int argc, char **argv) {
     preview.set(cv::CAP_PROP_FRAME_WIDTH, preview_width);
     preview.set(cv::CAP_PROP_FRAME_HEIGHT, preview_height);
 
-    // Create a window to display textures on screen.
-    cv::namedWindow("badcam", cv::WINDOW_NORMAL);
+    // Create a window to display images on screen.
+    cv::namedWindow(window_title, cv::WINDOW_NORMAL);
+    cv::setWindowProperty(window_title, cv::WND_PROP_FULLSCREEN, cv::WINDOW_FULLSCREEN);
 
     for (;;) {
         // Read videocapture feed and make sure it's not empty.
@@ -55,11 +60,12 @@ int main(int argc, char **argv) {
         // Merge updated channels.
         // cv::merge(channels_vec, preview_frame);
 
-        cv::imshow("badcam", preview_frame);
+        cv::resize(preview_frame, preview_frame, cv::Size(screen_width, screen_height));
+        cv::imshow(window_title, preview_frame);
         pressed_key = (char) cv::waitKey(25);
 
-        if (pressed_key == 27) {
-            // ESC key was pressed.
+        if (pressed_key == 27 || pressed_key == 113) {
+            // ESC or Q key was pressed.
             break;
         }
 
@@ -82,9 +88,6 @@ int main(int argc, char **argv) {
             // Save preview_frame to file.
             cv::imwrite("/home/luka/Desktop/capture" + std::to_string(millis_since_epoch) + ".jpg", capture_frame);
         }
-
-        // Unconditionally try and update the window to fullscreen.
-        cv::setWindowProperty("badcam", cv::WND_PROP_FULLSCREEN, cv::WINDOW_FULLSCREEN);
     }
 
     return 0;

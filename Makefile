@@ -1,51 +1,33 @@
 CPPCOMP=g++
 
 STD_CPPCOMP_FLAGS=-std=c++17 -Wall -pedantic -g
-CPPCOMP_FLAGS=$(STD_CCOMP_FLAGS)
-CPPLINK_FLAGS=-Wall -fopenmp
+CPPCOMP_FLAGS=$(STD_CPPCOMP_FLAGS)
+CPPLINK_FLAGS=-Wall
 
 STD_LIBS=-lm
+OPENCV_LIBS=-lopencv_core -lopencv_imgproc -lopencv_highgui -lopencv_imgcodecs -lopencv_videoio
+
+OPENCV_INCLUDE=-I/usr/include/opencv4
+INCLUDE=$(OPENCV_INCLUDE)
 
 SRC_DIR=./src
 BLD_DIR=./bld
 BIN_DIR=./bin
 
-SYSTEM_INCLUDE_DIR=
-SYSTEM_LIB_DIR=
-
 # Adds BLD_DIR to object parameter names.
-OBJS=$(patsubst %.o,$(BLD_DIR)/%.o,$^)
+OBJS=$(patsubst %.o,$(BLD_DIR)/%.o,$@.o)
 
 MKDIR=mkdir -p
 RM=rm -rf
 
-# Check what the current operating system is.
-UNAME_S=$(shell uname -s)
-
-# The curren OS is Linux.
-ifeq ($(UNAME_S),Linux)
-	SYSTEM_INCLUDE_DIR=/usr/include
-	SYSTEM_LIB_DIR=/usr/lib
-endif
-
-# The current OS is MacOS.
-ifeq ($(UNAME_S),Darwin)
-	SYSTEM_INCLUDE_DIR=/usr/local/include
-	SYSTEM_LIB_DIR=/usr/local/lib
-endif
-
-all: create build
+all: create badcam
 
 # Builds binaries.
-build: create
+badcam: create
 	@printf "\n"
-	$(CPPCOMP) $(CPPCOMP_FLAGS) -c $(SRC_DIR)/$@.c -o $(BLD_DIR)/$@.o
-	$(CPPCOMP) $(CPPLINK_FLAGS) $(OBJS) -o $(BIN_DIR)/$@ $(STD_LIBS) $(BEHEMA_LIBS)
+	$(CPPCOMP) $(CPPCOMP_FLAGS) -c $(SRC_DIR)/$@.cpp -o $(BLD_DIR)/$@.o $(INCLUDE)
+	$(CPPCOMP) $(CPPLINK_FLAGS) $(OBJS) -o $(BIN_DIR)/$@ $(STD_LIBS) $(OPENCV_LIBS)
 	@printf "\nCreated $@!\n"
-
-# Builds object files from source.
-%.o: $(SRC_DIR)/%.c
-	$(CPPCOMP) $(CPPCOMP_FLAGS) -c $^ -o $(BLD_DIR)/$@
 
 
 # Creates temporary working directories.
