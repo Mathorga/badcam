@@ -55,12 +55,12 @@ int main(int argc, char **argv) {
         cv::split(curr_frame, frame_channels);
 
         // Copy the current frame to the blend frame.
-        frame_channels[2].copyTo(blend_frame);
+        frame_channels[0].copyTo(blend_frame);
 
         for (uint8_t i = 0; i < old_frames.size(); i++) {
             cv::split(old_frames[i], frame_channels);
-	    std::cout << "Splitting " << i << std::endl;
-            cv::addWeighted(frame_channels[i + 1], 0.5, blend_frame, 0.5, 0.0, blend_frame);
+            std::cout << "Splitting " << i << std::endl;
+            cv::addWeighted(frame_channels[2 - i], 0.5, blend_frame, 0.5, 0.0, blend_frame);
         }
 
         cv::resize(blend_frame, display_frame, cv::Size(screen_width, screen_height));

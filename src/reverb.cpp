@@ -58,7 +58,6 @@ int main(int argc, char **argv) {
         for (cv::Mat frame : reverb_frames) {
             cv::addWeighted(frame, 0.5, blend_frame, 0.5, 0.0, blend_frame);
         }
-        // cv::addWeighted(prev_frame, 0.2, curr_frame, 0.8, 0.0, blend_frame);
 
         cv::resize(blend_frame, display_frame, cv::Size(screen_width, screen_height));
         cv::imshow(window_title, display_frame);
