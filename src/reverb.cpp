@@ -46,8 +46,8 @@ int main(int argc, char **argv) {
     cv::setWindowProperty(window_title, cv::WND_PROP_FULLSCREEN, cv::WINDOW_FULLSCREEN);
 
     // Prepopulate frames.
-    preview.read(curr_frame);
-    curr_frame.copyTo(prev_frame);
+    //preview.read(curr_frame);
+    //curr_frame.copyTo(prev_frame);
 
     for (;;) {
         // Read videocapture feed and make sure it's not empty.
@@ -79,7 +79,7 @@ int main(int argc, char **argv) {
         reverb_frames.push_back(curr_frame.clone());
 
         // Pop the first reverb frame out if reverb size is exceeded.
-        if (reverb_frames.size > reverb_size) {
+        if (reverb_frames.size() > reverb_size) {
             reverb_frames.pop_front();
         }
     }
