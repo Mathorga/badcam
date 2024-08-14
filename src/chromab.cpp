@@ -8,13 +8,12 @@
 #include <cmath>
 #include <iostream>
 #include <chrono>
-#include <list>
+#include <vector>
 
 /// OpenCV-only version.
 int main(int argc, char **argv) {
     std::string window_title = "badcam";
-    uint8_t current_channel_index = 0;
-    std::list<cv::Mat> old_frames;
+    std::vector<cv::Mat> old_frames;
     std::vector<cv::Mat> frame_channels;
     // cv::Mat prev_frame;
     cv::Mat curr_frame;
@@ -56,10 +55,11 @@ int main(int argc, char **argv) {
         cv::split(curr_frame, frame_channels);
 
         // Copy the current frame to the blend frame.
-        frame_channels[0].copyTo(blend_frame);
+        frame_channels[2].copyTo(blend_frame);
 
-        for (uint8_t i = 0; i < 2; i++) {
+        for (uint8_t i = 0; i < old_frames.size(); i++) {
             cv::split(old_frames[i], frame_channels);
+	    std::cout << "Splitting " << i << std::endl;
             cv::addWeighted(frame_channels[i + 1], 0.5, blend_frame, 0.5, 0.0, blend_frame);
         }
 
@@ -73,11 +73,11 @@ int main(int argc, char **argv) {
         }
 
         // Push the current frame in reverb.
-        reverb_frames.push_back(curr_frame.clone());
+        old_frames.push_back(curr_frame.clone());
 
         // Pop the first reverb frame out if reverb size is exceeded.
-        if (reverb_frames.size() > 2) {
-            reverb_frames.pop_front();
+        if (old_frames.size() > 2) {
+            old_frames.erase(old_frames.begin());
         }
     }
 
