@@ -13,8 +13,9 @@
 /// OpenCV-only version.
 int main(int argc, char **argv) {
     std::string window_title = "badcam";
-    uint8_t reverb_size = 4;
-    std::list<cv::Mat> reverb_frames;
+    uint8_t current_channel_index = 0;
+    std::list<cv::Mat> old_frames;
+    std::vector<cv::Mat> frame_channels;
     // cv::Mat prev_frame;
     cv::Mat curr_frame;
     cv::Mat blend_frame;
@@ -51,14 +52,16 @@ int main(int argc, char **argv) {
             break;
         }
 
-        // Copy the current frame to the blend frame.
-        curr_frame.copyTo(blend_frame);
+        // Split frame channels.
+        cv::split(curr_frame, frame_channels);
 
-        // Loop through reverb frames and add them one by one.
-        for (cv::Mat frame : reverb_frames) {
-            cv::addWeighted(frame, 0.5, blend_frame, 0.5, 0.0, blend_frame);
+        // Copy the current frame to the blend frame.
+        frame_channels[0].copyTo(blend_frame);
+
+        for (uint8_t i = 0; i < 2; i++) {
+            cv::split(old_frames[i], frame_channels);
+            cv::addWeighted(frame_channels[i + 1], 0.5, blend_frame, 0.5, 0.0, blend_frame);
         }
-        // cv::addWeighted(prev_frame, 0.2, curr_frame, 0.8, 0.0, blend_frame);
 
         cv::resize(blend_frame, display_frame, cv::Size(screen_width, screen_height));
         cv::imshow(window_title, display_frame);
@@ -73,7 +76,7 @@ int main(int argc, char **argv) {
         reverb_frames.push_back(curr_frame.clone());
 
         // Pop the first reverb frame out if reverb size is exceeded.
-        if (reverb_frames.size() > reverb_size) {
+        if (reverb_frames.size() > 2) {
             reverb_frames.pop_front();
         }
     }
