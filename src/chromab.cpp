@@ -15,6 +15,7 @@ int main(int argc, char **argv) {
     std::string window_title = "badcam";
     std::vector<cv::Mat> old_frames;
     std::vector<cv::Mat> frame_channels;
+    std::vector<cv::Mat> blend_channels;
     // cv::Mat prev_frame;
     cv::Mat curr_frame;
     cv::Mat blend_frame;
@@ -51,29 +52,38 @@ int main(int argc, char **argv) {
             break;
         }
 
+        // Add the current frame to the blend list.
+        old_frames.push_back(curr_frame.clone());
+
         // Split frame channels.
         cv::split(curr_frame, frame_channels);
 
-        // Copy the current frame to the blend frame.
-        frame_channels[0].copyTo(blend_frame);
+        // Only start working on frames when there's at least three channels ready.
+        if (old_frames.size() >= 3) {
+            // Clear output vector.
+            blend_channels.clear();
 
-        for (uint8_t i = 0; i < old_frames.size(); i++) {
-            cv::split(old_frames[i], frame_channels);
-            std::cout << "Splitting " << i << std::endl;
-            cv::addWeighted(frame_channels[2 - i], 0.5, blend_frame, 0.5, 0.0, blend_frame);
+            // Loop through previous frames.
+            for (uint8_t i = 0; i < old_frames.size(); i++) {
+                // Split the current frame into its channels.
+                cv::split(old_frames[i], frame_channels);
+
+                // Add the ith channel to the output vector.
+                blend_channels.push_back(frame_channels[i].clone());
+            }
+
+            // Remerge channels from the previous frames.
+            cv::merge(blend_channels, blend_frame);
+
+            cv::resize(blend_frame, display_frame, cv::Size(screen_width, screen_height));
+            cv::imshow(window_title, display_frame);
+            pressed_key = (char) cv::waitKey(25);
+
+            if (pressed_key == 27 || pressed_key == 113) {
+                // ESC or Q key was pressed.
+                break;
+	    }
         }
-
-        cv::resize(blend_frame, display_frame, cv::Size(screen_width, screen_height));
-        cv::imshow(window_title, display_frame);
-        pressed_key = (char) cv::waitKey(25);
-
-        if (pressed_key == 27 || pressed_key == 113) {
-            // ESC or Q key was pressed.
-            break;
-        }
-
-        // Push the current frame in reverb.
-        old_frames.push_back(curr_frame.clone());
 
         // Pop the first reverb frame out if reverb size is exceeded.
         if (old_frames.size() > 2) {
