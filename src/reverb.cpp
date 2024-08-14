@@ -10,12 +10,13 @@
 #include <chrono>
 #include <vector>
 #include <queue>
+#include <list>
 
 /// OpenCV-only version.
 int main(int argc, char **argv) {
     std::string window_title = "badcam";
     uint8_t reverb_size = 4;
-    std::queue<cv::Mat> reverb_frames;
+    std::list<cv::Mat> reverb_frames;
     // cv::Mat prev_frame;
     cv::Mat curr_frame;
     cv::Mat blend_frame;
@@ -75,11 +76,11 @@ int main(int argc, char **argv) {
         }
 
         // Push the current frame in reverb.
-        reverb_frames.push(curr_frame.clone());
+        reverb_frames.push_back(curr_frame.clone());
 
         // Pop the first reverb frame out if reverb size is exceeded.
         if (reverb_frames.size > reverb_size) {
-            reverb_frames.pop();
+            reverb_frames.pop_front();
         }
     }
 
