@@ -49,6 +49,10 @@ int main(int argc, char **argv) {
             break;
         }
 
+        if (prev_frame.empty()) {
+            continue;
+        }
+
         cv::addWeighted(prev_frame, 0.2, curr_frame, 0.8, 0.0, blend_frame);
 
         cv::resize(blend_frame, display_frame, cv::Size(screen_width, screen_height));
