@@ -8,16 +8,19 @@
 #include <cmath>
 #include <iostream>
 #include <chrono>
+#include <vector>
+#include <queue>
 
 /// OpenCV-only version.
 int main(int argc, char **argv) {
     std::string window_title = "badcam";
-    cv::Mat prev_frame;
+    uint8_t reverb_size = 4;
+    std::queue<cv::Mat> reverb_frames;
+    // cv::Mat prev_frame;
     cv::Mat curr_frame;
     cv::Mat blend_frame;
     cv::Mat display_frame;
     cv::VideoCapture preview;
-    // std::vector<cv::Mat> channels_vec;
     char pressed_key;
     std::chrono::system_clock::time_point time;
 
@@ -53,7 +56,14 @@ int main(int argc, char **argv) {
             break;
         }
 
-        cv::addWeighted(prev_frame, 0.2, curr_frame, 0.8, 0.0, blend_frame);
+        // Copy the current frame to the blend frame.
+        curr_frame.copyTo(blend_frame);
+
+        // Loop through reverb frames and add them one by one.
+        for (cv::Mat frame : reverb_frames) {
+            cv::addWeighted(frame, 0.5, blend_frame, 0.5, 0.0, blend_frame);
+        }
+        // cv::addWeighted(prev_frame, 0.2, curr_frame, 0.8, 0.0, blend_frame);
 
         cv::resize(blend_frame, display_frame, cv::Size(screen_width, screen_height));
         cv::imshow(window_title, display_frame);
@@ -64,8 +74,13 @@ int main(int argc, char **argv) {
             break;
         }
 
-        // Swap previous with current frame.
-        curr_frame.copyTo(prev_frame);
+        // Push the current frame in reverb.
+        reverb_frames.push(curr_frame.clone());
+
+        // Pop the first reverb frame out if reverb size is exceeded.
+        if (reverb_frames.size > reverb_size) {
+            reverb_frames.pop();
+        }
     }
 
     return 0;
