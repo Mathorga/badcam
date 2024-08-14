@@ -20,16 +20,12 @@ int main(int argc, char **argv) {
     // std::vector<cv::Mat> channels_vec;
     char pressed_key;
     std::chrono::system_clock::time_point time;
-    uint64_t millis_since_epoch;
 
     uint16_t preview_width = 320;
     uint16_t preview_height = 240;
 
     uint16_t screen_width = 720;
     uint16_t screen_height = 480;
-
-    uint16_t capture_width = 1280;
-    uint16_t capture_height = 960;
 
     preview.open(0);
     if (!preview.isOpened()) {
