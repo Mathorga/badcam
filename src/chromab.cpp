@@ -77,7 +77,7 @@ int main(int argc, char **argv) {
 
             cv::resize(blend_frame, display_frame, cv::Size(screen_width, screen_height));
             cv::imshow(window_title, display_frame);
-            pressed_key = (char) cv::waitKey(25);
+            pressed_key = (char) cv::waitKey(100);
 
             if (pressed_key == 27 || pressed_key == 113) {
                 // ESC or Q key was pressed.
