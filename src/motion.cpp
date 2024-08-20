@@ -54,6 +54,9 @@ int main(int argc, char **argv) {
         if (!prev_frame.empty()) {
             // Compute the absolute difference between the current frame and the previous one.
             cv::absdiff(prev_frame, blend_frame, blend_frame);
+	    // cv::threshold(blend_frame, blend_frame, 63.0, 255.0, cv::THRESH_BINARY);
+            cv::cvtColor(blend_frame, blend_frame, cv::COLOR_BGR2GRAY);
+            cv::adaptiveThreshold(blend_frame, blend_frame, 255.0, cv::ADAPTIVE_THRESH_GAUSSIAN_C, cv::THRESH_BINARY_INV, 13, 12);
         }
 
         cv::resize(blend_frame, display_frame, cv::Size(screen_width, screen_height));
