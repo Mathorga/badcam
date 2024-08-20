@@ -48,8 +48,13 @@ int main(int argc, char **argv) {
             break;
         }
 
-        // Compute the absolute difference between the current frame and the previous one.
-        cv::absdiff(prev_frame, curr_frame, blend_frame);
+        // Copy the current frame to the blend frame.
+        curr_frame.copyTo(blend_frame);
+
+        if (!prev_frame.empty()) {
+            // Compute the absolute difference between the current frame and the previous one.
+            cv::absdiff(prev_frame, blend_frame, blend_frame);
+        }
 
         cv::resize(blend_frame, display_frame, cv::Size(screen_width, screen_height));
         cv::imshow(window_title, display_frame);
