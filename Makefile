@@ -20,7 +20,7 @@ OBJS=$(patsubst %.o,$(BLD_DIR)/%.o,$@.o)
 MKDIR=mkdir -p
 RM=rm -rf
 
-all: create badcam reverb chromab
+all: create badcam reverb chromab motion
 
 # Builds binaries.
 badcam: create
@@ -36,6 +36,12 @@ reverb: create
 	@printf "\nCreated $@!\n"
 
 chromab: create
+	@printf "\n"
+	$(CPPCOMP) $(CPPCOMP_FLAGS) -c $(SRC_DIR)/$@.cpp -o $(BLD_DIR)/$@.o $(INCLUDE)
+	$(CPPCOMP) $(CPPLINK_FLAGS) $(OBJS) -o $(BIN_DIR)/$@ $(STD_LIBS) $(OPENCV_LIBS)
+	@printf "\nCreated $@!\n"
+
+motion: create
 	@printf "\n"
 	$(CPPCOMP) $(CPPCOMP_FLAGS) -c $(SRC_DIR)/$@.cpp -o $(BLD_DIR)/$@.o $(INCLUDE)
 	$(CPPCOMP) $(CPPLINK_FLAGS) $(OBJS) -o $(BIN_DIR)/$@ $(STD_LIBS) $(OPENCV_LIBS)
